@@ -1,11 +1,9 @@
 import 'dart:ui';
-
-import 'package:beauty_textfield/beauty_textfield.dart';
 import 'package:flutter/material.dart';
+import 'package:music_app/src/search/song_search.dart';
 import 'package:music_app/src/ui/widgets/custom_sliver_header.dart';
 import 'package:music_app/src/ui/widgets/title.dart' as title;
 import 'package:music_app/src/utils/constants.dart';
-
 
 class SearchScreen extends StatelessWidget {
   const SearchScreen({Key key}) : super(key: key);
@@ -27,16 +25,21 @@ class SearchScreen extends StatelessWidget {
               delegate: CustomSliverHeader(
                   maxExtent: 70,
                   minExtent: 70,
-                  widget: BeautyTextfield(
-                    width: 350,
-                    height: 50,
-                    prefixIcon: Icon(Icons.search),
-                    inputType: TextInputType.name,
-                    placeholder: 'Artist, songs, albums',
-                    accentColor: Colors.black,
-                    textColor: Colors.white,
-                    backgroundColor: Colors.white,
-                  ))),
+                  widget: Container(
+                      width: double.infinity,
+                      color: Colors.white,
+                      padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                      child: GestureDetector(
+                        onTap: () => showSearch(context: context, delegate: SongSearch()),
+                        child: Container(
+                            padding: EdgeInsets.only(left: 10),
+                            alignment: Alignment.centerLeft,
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(10),
+                                border: Border.all(color: Colors.grey, width: 3.0)),
+                            width: double.infinity,
+                            child: Icon(Icons.search)),
+                      )))),
           SliverList(
             delegate: SliverChildListDelegate([title.Title(title: 'Generes')]),
           ),

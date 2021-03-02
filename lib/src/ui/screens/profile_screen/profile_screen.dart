@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_sticky_header/flutter_sticky_header.dart';
+import 'package:music_app/src/bloc/main_bloc.dart';
+import 'package:music_app/src/models/user_model.dart';
 import 'package:music_app/src/utils/constants.dart';
 
 class ProfileScreen extends StatelessWidget {
@@ -10,7 +12,16 @@ class ProfileScreen extends StatelessWidget {
     return Container(
         child: CustomScrollView(
       slivers: [
-        SliverList(delegate: SliverChildListDelegate([_HeaderProfile()])),
+        SliverList(
+            delegate: SliverChildListDelegate([
+          StreamBuilder(
+              stream: MainBloc().userStream,
+              builder: (context, snapshot) {
+                return snapshot.hasData
+                    ? _HeaderProfile(user: snapshot.data)
+                    : Container(alignment: Alignment.center, child: CircularProgressIndicator());
+              })
+        ])),
         SliverStickyHeader(
           header: _NumberOfPlaylistFollowersFollowing(),
           sliver: SliverList(
@@ -23,8 +34,6 @@ class ProfileScreen extends StatelessWidget {
       ],
     ));
   }
-
-
 }
 
 class _NumberOfPlaylistFollowersFollowing extends StatelessWidget {
@@ -50,7 +59,10 @@ class _NumberOfPlaylistFollowersFollowing extends StatelessWidget {
 }
 
 class _HeaderProfile extends StatelessWidget {
-  
+  final User user;
+
+  _HeaderProfile({this.user});
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -60,17 +72,19 @@ class _HeaderProfile extends StatelessWidget {
         children: [
           CircleAvatar(
               radius: 60, backgroundImage: AssetImage('assets/me.jpg')),
-          Text('josealbertuz',
+          Text(user.username,
               style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold)),
           Padding(
               padding: EdgeInsets.symmetric(horizontal: 30, vertical: 15),
               child: Text(
-                profileDescription,
+                user.description == null
+                    ? 'Cuentanos algo sobre tí, actualiza tu descripción'
+                    : user.description,
                 style: TextStyle(fontSize: 18),
                 textAlign: TextAlign.center,
               )),
           OutlinedButton(
-              onPressed: () => null,
+              onPressed: () => Navigator.pushNamed(context, 'update_profile'),
               child: Text('Edit profile', style: TextStyle(fontSize: 16))),
         ],
       ),
@@ -79,8 +93,6 @@ class _HeaderProfile extends StatelessWidget {
 }
 
 class _RecentlyPlayedArtist extends StatelessWidget {
-  
-
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -112,7 +124,6 @@ class _RecentlyPlayedArtist extends StatelessWidget {
 }
 
 class _RecentPlaylist extends StatelessWidget {
-
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -133,7 +144,10 @@ class _RecentPlaylist extends StatelessWidget {
                       margin: EdgeInsets.only(left: 15),
                       width: 50,
                       height: 50,
-                      child: Image(image: AssetImage(yourRecentPlaylist[index]['photo']), fit: BoxFit.cover,),
+                      child: Image(
+                        image: AssetImage(yourRecentPlaylist[index]['photo']),
+                        fit: BoxFit.cover,
+                      ),
                     ),
                     title: Text(yourRecentPlaylist[index]['name']),
                     subtitle: Text(yourRecentPlaylist[index]['followers']),

@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:music_app/src/models/album_model.dart';
 import 'package:music_app/src/ui/screens/home_screen/home_screen.dart';
 import 'package:music_app/src/ui/screens/library_screen/library_screen.dart';
 import 'package:music_app/src/ui/screens/profile_screen/profile_screen.dart';
 import 'package:music_app/src/ui/screens/search_screen/search_screen.dart';
+import 'package:music_app/src/ui/screens/song_list_screen/song_list_screen.dart';
 import 'package:music_app/src/ui/widgets/custom_card.dart';
 import 'package:music_app/src/ui/widgets/playlist_item.dart';
 
@@ -11,7 +13,8 @@ final bottomAppBarOptions = <Widget>[
   HomeScreen(),
   SearchScreen(),
   LibraryScreen(),
-  ProfileScreen()
+  ProfileScreen(),
+  SongListScreen()
 ];
 
 final gridBoxGeneres = <Map<String, dynamic>>[
@@ -39,11 +42,11 @@ final gridBoxLibrary = <Map<String, dynamic>>[
   {'title': 'Liked', 'icon': FontAwesomeIcons.heart},
 ];
 
-final playlistItems = <PlaylistItem>[
-  PlaylistItem(imageUrl: 'assets/immunity.jpg', songName: 'Sofia', artistName: 'Clairo'),
-  PlaylistItem(imageUrl: 'assets/immunity.jpg', songName: 'Bags', artistName: 'Clairo'),
-  PlaylistItem(imageUrl: 'assets/immunity.jpg', songName: 'Alecwife', artistName: 'Clairo'),
-  PlaylistItem(imageUrl: 'assets/immunity.jpg', songName: 'North', artistName: 'Clairo'),
+final playlistItems = [
+  PlaylistItem(album: Album(cover: 'assets/immunity.jpg', name: 'Sofia', artist: 'Clairo')),
+  PlaylistItem(album: Album(cover: 'assets/immunity.jpg', name: 'Bags', artist: 'Clairo')),
+  PlaylistItem(album: Album(cover: 'assets/immunity.jpg', name: 'I Would\'t Ask You', artist: 'Clairo')),
+  PlaylistItem(album: Album(cover: 'assets/immunity.jpg', name: 'Close To You', artist: 'Clairo')),
 ];
 
 final newReleasesList = <CustomCard>[
@@ -211,5 +214,4 @@ final settingsOptions = <Map<String, String>>[
   },
   {'title': 'Privacy Policy', 'subtitle': 'Important for both of us'},
   {'title': 'Support', 'subtitle': 'Get help from us and the community'},
-  {'title': 'Log Out', 'subtitle': 'Exit from the app and back to log in'},
 ];

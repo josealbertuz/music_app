@@ -9,17 +9,17 @@ class LoginSignupSlideshowScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      resizeToAvoidBottomInset: true,
-      body: Stack(
-        children: [
-          _Background(),
-          Slideshow(
-              bulletColor: Colors.grey,
-              bulletColorFilled: Colors.white,
-              slides: [LoginSlide(), SignupSlide()])
-        ],
-      ),
-    );
+        resizeToAvoidBottomInset: true,
+        body: Stack(
+    children: [
+      _Background(),
+      Slideshow(
+          bulletColor: Colors.grey,
+          bulletColorFilled: Colors.white,
+          slides: [LoginSlide(), SignupSlide()])
+    ],
+        ),
+      );
   }
 }
 

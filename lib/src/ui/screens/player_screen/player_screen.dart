@@ -1,26 +1,36 @@
 import 'package:flutter/material.dart';
+import 'package:music_app/src/bloc/player_bloc.dart';
+import 'package:music_app/src/models/song_model.dart';
 import 'package:music_app/src/ui/widgets/gradient_background_from_image.dart';
 import 'package:music_app/src/utils/app_utils.dart';
-
 
 class PlayerScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        GradientBackgroundFromImage(),
-        Scaffold(
-          backgroundColor: Colors.transparent,
-          appBar: _appBar(context),
-          body: Column(
-          children: [_SongCoverInfo(), _MediaControls()],
-        ),
-        )
-      ],
-    );
+    return StreamBuilder(
+        stream: PlayerBloc().songStream,
+        builder: (BuildContext context, AsyncSnapshot<Song> snapshot) {
+          return snapshot.hasData
+              ? Stack(
+                  children: [
+                    GradientBackgroundFromImage(image: snapshot.data.cover),
+                    Scaffold(
+                      backgroundColor: Colors.transparent,
+                      appBar: _appBar(context, snapshot.data),
+                      body: Column(
+                        children: [
+                          _SongCoverInfo(song: snapshot.data),
+                          _MediaControls()
+                        ],
+                      ),
+                    )
+                  ],
+                )
+              : Center(child: CircularProgressIndicator());
+        });
   }
 
-  Widget _appBar(BuildContext context) {
+  Widget _appBar(BuildContext context, Song song) {
     return AppBar(
       leading: IconButton(
         icon: Icon(Icons.keyboard_arrow_down),
@@ -30,7 +40,7 @@ class PlayerScreen extends StatelessWidget {
         child: Column(
           children: [
             Text('Playing from album', style: TextStyle(fontSize: 14)),
-            Text('Immunity')
+            Text(song.album)
           ],
         ),
       ),
@@ -43,7 +53,10 @@ class PlayerScreen extends StatelessWidget {
 }
 
 class _SongCoverInfo extends StatelessWidget {
-  
+  final Song song;
+
+  const _SongCoverInfo({this.song});
+
   @override
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
@@ -56,7 +69,7 @@ class _SongCoverInfo extends StatelessWidget {
             Container(
               height: screenSize.height * 0.58,
               width: screenSize.width * 0.9,
-              child: Image(image: AssetImage('assets/immunity.jpg')),
+              child: Image(image: NetworkImage(song.cover)),
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -64,12 +77,12 @@ class _SongCoverInfo extends StatelessWidget {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Alecwife',
+                    Text(song.name,
                         style: TextStyle(
                             fontSize: 23,
                             fontWeight: FontWeight.bold,
                             color: Colors.white)),
-                    Text('Clairo',
+                    Text(song.artist,
                         style: TextStyle(fontSize: 18, color: Colors.white))
                   ],
                 ),
@@ -101,7 +114,7 @@ class _MediaControlsState extends State<_MediaControls> {
     );
   }
 
-   Widget _slider() {
+  Widget _slider() {
     return Column(
       children: [
         Row(

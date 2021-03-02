@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 final primaryTheme = ThemeData(
   appBarTheme: appBarTheme,
   sliderTheme: sliderTheme,
-  inputDecorationTheme: inputDecorationTheme
 );
 
 final appBarTheme = AppBarTheme(
@@ -20,11 +19,13 @@ final sliderTheme = SliderThemeData(
     valueIndicatorColor: Colors.white,
     valueIndicatorTextStyle: TextStyle(color: Colors.black));
 
-final inputDecorationTheme = InputDecorationTheme(
-  border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+final inputDecorationThemeLogin = InputDecoration(
+  border: OutlineInputBorder(),
   contentPadding: EdgeInsets.all(20),
   filled: true,
   fillColor: Colors.white,
-  focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-  labelStyle: TextStyle(color: Colors.black),
+  focusedBorder: OutlineInputBorder(),
+  floatingLabelBehavior: FloatingLabelBehavior.never,
+  errorStyle: TextStyle(fontSize: 18)
+  
 );

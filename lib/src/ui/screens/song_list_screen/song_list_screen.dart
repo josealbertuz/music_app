@@ -1,38 +1,40 @@
 import 'package:flutter/material.dart';
-import 'package:music_app/src/ui/widgets/minimized_player.dart';
-import 'package:music_app/src/utils/constants.dart';
+import 'package:music_app/src/bloc/player_bloc.dart';
+import 'package:music_app/src/bloc/song_list_bloc.dart';
+import 'package:music_app/src/models/album_model.dart';
 
-class SongListPage extends StatelessWidget {
-  const SongListPage({Key key}) : super(key: key);
+class SongListScreen extends StatelessWidget {
+  const SongListScreen({Key key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-        child: Stack(
-          children: [
-            SingleChildScrollView(
-              child: Column(
-                children: [
-                  _SongListHeader(),
-                  _SongListBody(),
-                  SizedBox(height: MediaQuery.of(context).size.height * 0.09)
-                ],
-              ),
-            ),
-            Positioned(
-              bottom: 0,
-              right: 0,
-              child: MinimizedPlayer())
-          ],
-        ),
+        child: StreamBuilder(
+          stream: SongListBloc().albumStream,
+          builder: (context, snapshot) {
+            return snapshot.hasData
+                ? SingleChildScrollView(
+                    child: Column(
+                      children: [
+                        _SongListHeader(album: snapshot.data),
+                        _SongListBody(album: snapshot.data),
+                        SizedBox(
+                            height: MediaQuery.of(context).size.height * 0.09)
+                      ],
+                    ),
+                  )
+                : Center(child: CircularProgressIndicator());
+          })
       ),
     );
   }
 }
 
 class _SongListBody extends StatelessWidget {
-  
+  final Album album;
+
+  const _SongListBody({Key key, this.album}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -40,11 +42,14 @@ class _SongListBody extends StatelessWidget {
       padding: EdgeInsets.all(10),
       physics: NeverScrollableScrollPhysics(),
       shrinkWrap: true,
-      itemCount: immunity.length,
+      itemCount: album.songs.length,
       itemBuilder: (context, index) {
-        return ListTile(
-          title: Text(immunity[index]['title']),
-          subtitle: Text(immunity[index]['artist']),
+        return GestureDetector(
+          onTap: () => PlayerBloc().addSong(album.songs[index]),
+                  child: ListTile(
+            title: Text(album.songs[index].name),
+            subtitle: Text(album.songs[index].artist),
+          ),
         );
       },
     );
@@ -52,13 +57,14 @@ class _SongListBody extends StatelessWidget {
 }
 
 class _SongListHeader extends StatelessWidget {
-  
+  final Album album;
+
+  const _SongListHeader({Key key, this.album}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-
     final screenSize = MediaQuery.of(context).size;
-    
+
     return Container(
       height: screenSize.height * 0.52,
       child: Column(
@@ -69,9 +75,9 @@ class _SongListHeader extends StatelessWidget {
             child: Image(
                 width: 170,
                 height: 170,
-                image: AssetImage('assets/immunity.jpg')),
+                image: NetworkImage(album.cover)),
           ),
-          Text('Immunity',
+          Text(album.name,
               style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold)),
           OutlinedButton(
               style: OutlinedButton.styleFrom(
@@ -80,7 +86,7 @@ class _SongListHeader extends StatelessWidget {
               ),
               onPressed: null,
               child: Text('Save', style: TextStyle(fontSize: 16))),
-          Text('Album by Clairo . 2019'),
+          Text('Album by ${album.artist} . ${album.release}'),
           SizedBox(height: 10),
           TextButton(
               style: TextButton.styleFrom(

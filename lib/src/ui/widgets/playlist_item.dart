@@ -1,16 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:music_app/src/bloc/main_bloc.dart';
+import 'package:music_app/src/bloc/song_list_bloc.dart';
+import 'package:music_app/src/models/album_model.dart';
 
 class PlaylistItem extends StatelessWidget {
-  final imageUrl;
-  final songName;
-  final artistName;
+  final Album album;
 
-  PlaylistItem({@required this.imageUrl, @required this.songName, @required this.artistName});
+  const PlaylistItem({@required this.album});
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => Navigator.pushNamed(context, 'song_list'),
+      onTap: () {
+        SongListBloc().fetchAlbumById(album.id);
+        MainBloc().changeScreen(4);
+      },
       child: Container(
           padding: EdgeInsets.all(8),
           child: Column(
@@ -24,11 +28,14 @@ class PlaylistItem extends StatelessWidget {
                 decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(30),
                     image: DecorationImage(
-                        image: AssetImage(imageUrl), fit: BoxFit.cover)),
+                        image: RegExp('^https.+').hasMatch(album.cover)
+                            ? NetworkImage(album.cover)
+                            : AssetImage(album.cover),
+                        fit: BoxFit.cover)),
               ),
-              Text(songName,
+              Text(album.name,
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-              Text(artistName,
+              Text(album.artist,
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16))
             ],
           )),

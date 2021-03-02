@@ -1,30 +1,53 @@
 import 'package:flutter/material.dart';
+import 'package:music_app/src/bloc/home_bloc.dart';
+import 'package:music_app/src/models/album_model.dart';
+import 'package:music_app/src/ui/widgets/creation_aware_list_item.dart';
 import 'package:music_app/src/ui/widgets/playlist_item.dart';
 import 'package:music_app/src/ui/widgets/title.dart' as title;
 import 'package:music_app/src/ui/widgets/title_with_icon.dart';
 import 'package:music_app/src/utils/constants.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({Key key}) : super(key: key);
+
+  @override
+  _HomeScreenState createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  @override
+  void initState() {
+    HomeBloc().initStream();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Padding(
         padding: EdgeInsets.all(10),
         child: SingleChildScrollView(
+          physics: BouncingScrollPhysics(),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              TitleWithIcon(title: 'New Releases', icon: Icons.settings, route: 'settings'),
+              TitleWithIcon(
+                  title: 'New Releases',
+                  icon: Icons.settings,
+                  route: 'settings'),
               _NewReleases(),
               title.Title(title: 'Recently played'),
-              _PlaylistView(playlistItems),
+              StreamBuilder(
+                  stream: HomeBloc().albumStream,
+                  builder: (context, snapshot) {
+                    return snapshot.hasData
+                        ? _RecentlyPlayed(albums: snapshot.data)
+                        : Center(child: CircularProgressIndicator());
+                  }),
               title.Title(title: 'Made for you'),
               _PlaylistView(playlistItems),
               title.Title(title: 'Based on your listening'),
               _PlaylistView(playlistItems),
-              SizedBox(height: MediaQuery.of(context).size.height * 0.09)
             ],
           ),
         ));
@@ -50,6 +73,31 @@ class _NewReleases extends StatelessWidget {
   }
 }
 
+class _RecentlyPlayed extends StatelessWidget {
+  final List<Album> albums;
+
+  const _RecentlyPlayed({Key key, @required this.albums}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final screenSize = MediaQuery.of(context).size;
+
+    return Container(
+        height: screenSize.height * 0.29,
+        child: ListView.builder(
+            physics: BouncingScrollPhysics(),
+            scrollDirection: Axis.horizontal,
+            itemCount: albums.length,
+            itemBuilder: (context, index) => CreationAwareListItem(
+                  itemCreated: () {
+                    if ((albums.length - 1) == index) HomeBloc().fetchAlbums();
+                  },
+                  child: PlaylistItem(
+                      album: albums[index],
+        ))));
+  }
+}
+
 class _PlaylistView extends StatelessWidget {
   final List<PlaylistItem> _playlistList;
 
@@ -70,5 +118,3 @@ class _PlaylistView extends StatelessWidget {
         ));
   }
 }
-
-

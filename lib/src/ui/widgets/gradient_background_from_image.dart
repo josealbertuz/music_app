@@ -1,22 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:palette_generator/palette_generator.dart';
 
-
 class GradientBackgroundFromImage extends StatefulWidget {
-  GradientBackgroundFromImage({Key key}) : super(key: key);
+  final String image;
+
+  const GradientBackgroundFromImage({Key key, this.image}) : super(key: key);
+  
 
   @override
-  _GradientBackgroundFromImageState createState() => _GradientBackgroundFromImageState();
+  _GradientBackgroundFromImageState createState() =>
+      _GradientBackgroundFromImageState();
 }
 
-class _GradientBackgroundFromImageState extends State<GradientBackgroundFromImage> {
+class _GradientBackgroundFromImageState
+    extends State<GradientBackgroundFromImage> {
   Color _color;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: _gradient()
-    );
+    return Container(decoration: _gradient());
   }
 
   @override
@@ -27,7 +29,7 @@ class _GradientBackgroundFromImageState extends State<GradientBackgroundFromImag
 
   void _generateBackground() async {
     final colorGenerator = await PaletteGenerator.fromImageProvider(
-        AssetImage('assets/immunity.jpg'));
+        NetworkImage(widget.image));
     _color = colorGenerator.dominantColor.color;
     setState(() {});
   }

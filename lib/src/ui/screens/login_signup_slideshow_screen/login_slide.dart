@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:music_app/src/bloc/login_bloc.dart';
+import 'package:music_app/src/ui/themes/app_theme.dart';
 import 'package:music_app/src/ui/widgets/divider_with_text.dart';
+import 'package:music_app/src/ui/widgets/loading_dialog.dart';
 
 class LoginSlide extends StatelessWidget {
   const LoginSlide({Key key}) : super(key: key);
@@ -124,51 +127,86 @@ class _TextFieldsAndLoginButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final Size _screenSize = MediaQuery.of(context).size;
+    final LoginBloc loginBloc = LoginBloc();
 
     return Container(
         width: double.infinity,
         height: _screenSize.height * 0.35,
         padding: EdgeInsets.fromLTRB(20, 0, 20, 0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        child: Form(
+            child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
-            TextField(
-              cursorColor: Colors.black,
-              keyboardType: TextInputType.emailAddress,
-              decoration: InputDecoration(
-                  labelText: 'Email',
-                  hintText: 'Email',
-                  floatingLabelBehavior: FloatingLabelBehavior.never),
+            StreamBuilder(
+              stream: loginBloc.emailStream,
+              builder: (context, snapshot) {
+                return TextFormField(
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  cursorColor: Colors.black,
+                  decoration: inputDecorationThemeLogin.copyWith(
+                      labelText: 'Email', errorText: snapshot.error),
+                  onChanged: (value) => loginBloc.changeEmail(value),
+                );
+              },
             ),
-            TextField(
-              obscureText: true,
-              cursorColor: Colors.black,
-              keyboardType: TextInputType.text,
-              decoration: InputDecoration(
-                  labelText: 'Password',
-                  floatingLabelBehavior: FloatingLabelBehavior.never),
+            StreamBuilder(
+              stream: loginBloc.passwordStream,
+              builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
+                return TextFormField(
+                  obscureText: true,
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  cursorColor: Colors.black,
+                  decoration: inputDecorationThemeLogin.copyWith(
+                      labelText: 'Password', errorText: snapshot.error),
+                  onChanged: (value) => loginBloc.changePassword(value),
+                );
+              },
             ),
-            TextButton(
-                onPressed: null,
-                child: Text('Have you forgotten your password?',
-                    style: TextStyle(color: Colors.white, fontSize: 17))),
             Container(
               padding: EdgeInsets.only(top: 10),
               height: _screenSize.height * 0.09,
               width: double.infinity,
-              child: TextButton(
-                  onPressed: null,
-                  style: TextButton.styleFrom(
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(30)),
-                      backgroundColor: Colors.green[500]),
-                  child: Text('Log in',
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold))),
+              child: StreamBuilder(
+                stream: loginBloc.formValidStream,
+                builder: (context, snapshot) {
+                  return TextButton(
+                      onPressed:
+                          snapshot.hasData ? () => getUser(context) : null,
+                      style: TextButton.styleFrom(
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(30)),
+                          backgroundColor: snapshot.hasData
+                              ? Colors.green[500]
+                              : Colors.grey),
+                      child: Text('Log in',
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold)));
+                },
+              ),
             )
           ],
-        ));
+        )));
+  }
+
+  void getUser(BuildContext context) async {
+    showDialog(
+        barrierDismissible: false,
+        context: context,
+        builder: (context) => LoadingDialog());
+
+    LoginBloc().getUser().then((value) {
+      if (value) {
+        Navigator.pushReplacementNamed(context, 'main');
+      } else {
+        Navigator.pop(context);
+        Scaffold.of(context).showSnackBar(SnackBar(
+            backgroundColor: Colors.white,
+            behavior: SnackBarBehavior.floating,
+            content: Text('Este usuario no existe',
+                style: TextStyle(color: Colors.black))));
+      }
+    });
   }
 }

@@ -18,7 +18,7 @@ class CustomCard extends StatelessWidget {
       width: screenSize.width * 0.48,
       padding: EdgeInsets.only(right: 10),
       child: Card(
-        elevation: 10,
+        elevation: 0.5,
         shape:
             RoundedRectangleBorder(borderRadius: BorderRadius.circular(30.0)),
         child: ClipRRect(
