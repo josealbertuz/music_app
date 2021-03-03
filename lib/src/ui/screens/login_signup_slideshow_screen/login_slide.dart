@@ -198,7 +198,7 @@ class _TextFieldsAndLoginButton extends StatelessWidget {
 
     LoginBloc().getUser().then((value) {
       if (value) {
-        Navigator.pushReplacementNamed(context, 'main');
+        Navigator.pushNamedAndRemoveUntil(context, 'main', (route) => false);
       } else {
         Navigator.pop(context);
         Scaffold.of(context).showSnackBar(SnackBar(

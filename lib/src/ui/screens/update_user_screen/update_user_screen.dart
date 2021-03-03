@@ -73,7 +73,7 @@ class UpdateUserSreen extends StatelessWidget {
       actions: [
         Padding(
             padding: EdgeInsets.only(right: 5),
-            child: StreamBuilder<bool>(
+            child: StreamBuilder<String>(
                 stream: updateBloc.validateForm,
                 builder: (context, snapshot) {
                   return IconButton(

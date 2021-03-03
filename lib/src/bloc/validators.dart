@@ -34,4 +34,16 @@ class Validators {
       }
     },
   );
+
+  StreamTransformer<String, String> equals(String str) {
+    return StreamTransformer<String, String>.fromHandlers(
+      handleData: (data, sink) {
+        if (data == str) {
+          sink.addError('Campo repetido');
+        } else {
+          sink.add(str);
+        }
+      },
+    );
+  }
 }

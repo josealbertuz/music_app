@@ -29,15 +29,15 @@ class UpdateProfileBloc with Validators {
 
   Function(String) get changeDescription => _descriptionSubject.add;
 
-  Stream<bool> get validateForm => Rx.combineLatest2(
-      usernameStream, passwordStream, (username, password) => true);
+  Stream<String> get validateForm =>
+      RaceStream<String>([usernameStream, passwordStream]);
 
   Future<bool> updateUser() async {
-    String username = _usernameSubject.value;
-    String password = _passwordSubject.value;
-    String description = _descriptionSubject.value;
-
     User user = User.clone(MainBloc().user);
+
+    String username = _usernameSubject.value ?? user.username;
+    String password = _passwordSubject.value ?? user.password;
+    String description = _descriptionSubject.value ?? user.description;
 
     user
       ..username = username

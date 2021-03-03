@@ -16,7 +16,10 @@ class MainScreen extends StatelessWidget {
             stream: MainBloc().getIndexScreen,
             initialData: 0,
             builder: (context, snapshot) {
-              return SafeArea(child: bottomAppBarOptions[snapshot.data]);
+              return SafeArea(child: IndexedStack(
+                index: snapshot.data,
+                children: bottomAppBarOptions,
+              ));
             }),
         bottomNavigationBar: _BottomAppBar(),
         bottomSheet: StreamBuilder(

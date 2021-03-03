@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:music_app/src/bloc/home_bloc.dart';
 import 'package:music_app/src/models/album_model.dart';
 import 'package:music_app/src/ui/widgets/creation_aware_list_item.dart';
+import 'package:music_app/src/ui/widgets/placeholder_container.dart';
 import 'package:music_app/src/ui/widgets/playlist_item.dart';
 import 'package:music_app/src/ui/widgets/title.dart' as title;
 import 'package:music_app/src/ui/widgets/title_with_icon.dart';
@@ -42,7 +43,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   builder: (context, snapshot) {
                     return snapshot.hasData
                         ? _RecentlyPlayed(albums: snapshot.data)
-                        : Center(child: CircularProgressIndicator());
+                        : _AlbumListPlaceholder();
                   }),
               title.Title(title: 'Made for you'),
               _PlaylistView(playlistItems),
@@ -89,12 +90,12 @@ class _RecentlyPlayed extends StatelessWidget {
             scrollDirection: Axis.horizontal,
             itemCount: albums.length,
             itemBuilder: (context, index) => CreationAwareListItem(
-                  itemCreated: () {
-                    if ((albums.length - 1) == index) HomeBloc().fetchAlbums();
-                  },
-                  child: PlaylistItem(
-                      album: albums[index],
-        ))));
+                itemCreated: () {
+                  if ((albums.length - 1) == index) HomeBloc().fetchAlbums();
+                },
+                child: PlaylistItem(
+                  album: albums[index],
+                ))));
   }
 }
 
@@ -116,5 +117,27 @@ class _PlaylistView extends StatelessWidget {
           physics: ClampingScrollPhysics(),
           children: _playlistList,
         ));
+  }
+}
+
+class _AlbumListPlaceholder extends StatelessWidget {
+  const _AlbumListPlaceholder({Key key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final screenSize = MediaQuery.of(context).size;
+
+    return Container(
+        height: screenSize.height * 0.2,
+        child: ListView(
+            physics: BouncingScrollPhysics(),
+            scrollDirection: Axis.horizontal,
+            children: List<Widget>.generate(4, (index) {
+              return PlaceholderContainerAnimation(
+                margin: EdgeInsets.symmetric(horizontal: 10),
+                width: 150,
+                height: 150,
+              );
+            })));
   }
 }
